@@ -2,6 +2,7 @@ from tensorflow.examples.tutorials.mnist import input_data
 import tensorflow as tf
 import numpy as np
 import Image
+#zerg，20181024
 
 def weight_variable(shape, dtype, name):
     initial = tf.truncated_normal(shape = shape, stddev = 0.1, dtype = dtype, name = name)
