@@ -1,7 +1,7 @@
 from tensorflow.examples.tutorials.mnist import input_data
 import tensorflow as tf
 import numpy as np
-import Image
+from PIL import Image#python3中image要从PIL中导入
 #zerg，20181024 test
 
 def weight_variable(shape, dtype, name):
@@ -18,7 +18,7 @@ def conv2d(x, W):
 def max_pool_2x2(x):
     return tf.nn.max_pool(x, ksize = [1, 2, 2, 1], strides = [1, 2, 2, 1], padding = 'SAME')
 
-mnist = input_data.read_data_sets("MNIST_data", one_hot = True)
+mnist = input_data.read_data_sets("MNIST_DATA", one_hot = True)
 
 x = tf.placeholder("float", [None, 784])
 y = tf.placeholder("float", [None, 10])
@@ -64,12 +64,12 @@ session.run(init)
 
 # train
 def Train() :
-	for i in range(10000):
+	for i in range(900):
 	    batch = mnist.train.next_batch(50)
 	    session.run(train, feed_dict = {x:batch[0], y:batch[1], keep_prob:0.5})
 	    if i % 100 == 0:
-		print("step %4d: " % i)
-		print(session.run(accuracy, feed_dict = {x:batch[0], y:batch[1], keep_prob:1}))
+		    print("step %4d: " % i)
+		    print(session.run(accuracy, feed_dict = {x:batch[0], y:batch[1], keep_prob:1}))
 
 	print(session.run(accuracy, feed_dict = {x:mnist.test.images, y:mnist.test.labels, keep_prob:1}))
 
@@ -84,51 +84,48 @@ def restore() :
 	saver = tf.train.Saver()
 	saver.restore(session, save_path)
 
-def getTestPicArray(filename) :
-	im = Image.open(filename)
-        x_s = 28
-        y_s = 28
-        out = im.resize((x_s, y_s), Image.ANTIALIAS) 
-        
-	im_arr = np.array(out.convert('L'))
-	
-	num0 = 0
-	num255 = 0
-	threshold = 100
+def getTestPicArray(filename):
+    im = Image.open(filename)
+    x_s = 28
+    y_s = 28
+    out = im.resize((x_s, y_s), Image.ANTIALIAS)
+    im_arr = np.array(out.convert('L'))
+    num0 = 0
+    num255 = 0
+    threshold = 100
+    for x in range(x_s):#进行二值化处理
+        for y in range(y_s):
+            if(im_arr[x][y] > threshold):num255 = num255 + 1
+            else : num0 = num0 + 1
 
-	for x in range(x_s):
-	    for y in range(y_s):
-		if im_arr[x][y] > threshold : num255 = num255 + 1
-		else : num0 = num0 + 1
-
-	if(num255 > num0) :
-		print("convert!")
-		for x in range(x_s):
-		    for y in range(y_s):
-			im_arr[x][y] = 255 - im_arr[x][y]
-			if(im_arr[x][y] < threshold) :  im_arr[x][y] = 0
+    if(num255 > num0) :
+        print("convert!")
+        for x in range(x_s):
+            for y in range(y_s):
+                im_arr[x][y] = 255 - im_arr[x][y]
+                if(im_arr[x][y] < threshold) :  im_arr[x][y] = 0
 			#if(im_arr[x][y] > threshold) : im_arr[x][y] = 0
 			#else : im_arr[x][y] = 255
 			#if(im_arr[x][y] < threshold): im_arr[x][y] = im_arr[x][y] - im_arr[x][y] / 2
 
-	out = Image.fromarray(np.uint8(im_arr))
-	out.save(filename.split('/')[0] + '/28pix/' + filename.split('/')[1])
+    out = Image.fromarray(np.uint8(im_arr))
+    out.save("./png/1psq.png")
 	#print im_arr
-	nm = im_arr.reshape((1, 784))
+    nm = im_arr.reshape((1, 784))
 	
 	
 	
 
-	nm = nm.astype(np.float32)
-	nm = np.multiply(nm, 1.0 / 255.0)
+    nm = nm.astype(np.float32)
+    nm = np.multiply(nm, 1.0 / 255.0)
 	
-	return nm
+    return nm
 
 def testMyPicture() :
-	testNum = input("input the number of test picture:")
-	for i in range(testNum) :
-		testPicture = raw_input("input the test picture's path:")
-		oneTestx = getTestPicArray(testPicture)
+	#testNum = input("input the number of test picture:")
+	for i in range(1) :
+		#testPicture = raw_input("input the test picture's path:")
+		oneTestx = getTestPicArray("./png/1ps.png")
 		ans = tf.argmax(y_fc2, 1)
 		print("The prediction answer is:") 
 		print(session.run(ans, feed_dict = {x:oneTestx, keep_prob:1}))
