@@ -1,6 +1,5 @@
 from PIL import Image#python3中image要从PIL中导入
 import numpy as np
-import tensorflow as tf
 
 def getTestPicArray(filename):
     im = Image.open(filename)

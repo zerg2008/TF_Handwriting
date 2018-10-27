@@ -6,6 +6,8 @@ from PIL import Image#python3中image要从PIL中导入
 
 def weight_variable(shape, dtype, name):
     initial = tf.truncated_normal(shape = shape, stddev = 0.1, dtype = dtype, name = name)
+    #tf.truncated_normal这个函数产生正太分布，均值和标准差自己设定。
+    # shape表示生成张量的维度，mean是均值，stddev是标准差。
     return tf.Variable(initial)
 
 def bias_variable(shape, dtype, name):
@@ -23,6 +25,7 @@ mnist = input_data.read_data_sets("MNIST_DATA", one_hot = True)
 x = tf.placeholder("float", [None, 784])
 y = tf.placeholder("float", [None, 10])
 x_image = tf.reshape(x, [-1, 28, 28, 1])
+# -1表示任意数量的样本数,大小为28x28的二维张量
 
 # convolution 1
 weight_conv1 = weight_variable([5, 5, 1, 32], dtype = "float", name = 'weight_conv1')
@@ -129,6 +132,7 @@ def testMyPicture() :
 		ans = tf.argmax(y_fc2, 1)
 		print("The prediction answer is:") 
 		print(session.run(ans, feed_dict = {x:oneTestx, keep_prob:1}))
+        #意思是每个元素被保留的概率，那么 keep_prob:1就是所有元素全部保留的意思。
 save_path = "network/cnn.ckpt"
 Train()
 save()
