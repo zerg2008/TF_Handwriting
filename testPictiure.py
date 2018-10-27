@@ -1,3 +1,7 @@
+from PIL import Image#python3中image要从PIL中导入
+import numpy as np
+import tensorflow as tf
+
 def getTestPicArray(filename):
     im = Image.open(filename)
     x_s = 28
@@ -34,13 +38,3 @@ def getTestPicArray(filename):
 
     return nm
 
-
-def testMyPicture():
-    # testNum = input("input the number of test picture:")
-    for i in range(1):
-        # testPicture = raw_input("input the test picture's path:")
-        oneTestx = getTestPicArray("./png/1ps.png")
-        ans = tf.argmax(y_fc2, 1)
-        print("The prediction answer is:")
-        print(session.run(ans, feed_dict={x: oneTestx, keep_prob: 1}))
-    # 意思是每个元素被保留的概率，那么 keep_prob:1就是所有元素全部保留的意思。
