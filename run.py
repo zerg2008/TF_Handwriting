@@ -14,6 +14,10 @@ def bias_variable(shape, dtype, name):
     initial = tf.constant(0.1, shape = shape, dtype = dtype, name = name)
     return tf.Variable(initial)
 
+#定义卷积函数，其中x是输入，W是权重，也可以理解成卷积核，strides表示步长，或者说是滑动速率，包含长宽方向
+#的步长。padding表示补齐数据。 目前有两种补齐方式，一种是SAME，表示补齐操作后（在原始图像周围补充0），实
+#际卷积中，参与计算的原始图像数据都会参与。一种是VALID，补齐操作后，进行卷积过程中，原始图片中右边或者底部
+#的像素数据可能出现丢弃的情况。
 def conv2d(x, W):
     return tf.nn.conv2d(x, W, strides = [1, 1, 1, 1], padding = 'SAME')
 
