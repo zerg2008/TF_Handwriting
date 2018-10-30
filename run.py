@@ -21,6 +21,12 @@ def bias_variable(shape, dtype, name):
 def conv2d(x, W):
     return tf.nn.conv2d(x, W, strides = [1, 1, 1, 1], padding = 'SAME')
 
+#这步定义函数进行池化操作，在卷积运算中，是一种数据下采样的操作，降低数据量，聚类数据的有效手段。常见的
+#池化操作包含最大值池化和均值池化。这里的2*2池化，就是每4个值中取一个，池化操作的数据区域边缘不重叠。
+#函数原型：def max_pool(value, ksize, strides, padding, data_format="NHWC", name=None)。对ksize和strides
+#定义的理解要基于data_format进行。默认NHWC，表示4维数据，[batch,height,width,channels]. 下面函数中的ksize，
+#strides中，每次处理都是一张图片，对应的处理数据是一个通道（例如，只是黑白图片）。长宽都是2，表明是2*2的
+#池化区域，也反应出下采样的速度。
 def max_pool_2x2(x):
     return tf.nn.max_pool(x, ksize = [1, 2, 2, 1], strides = [1, 2, 2, 1], padding = 'SAME')
 
@@ -35,6 +41,7 @@ x_image = tf.reshape(x, [-1, 28, 28, 1])
 weight_conv1 = weight_variable([5, 5, 1, 32], dtype = "float", name = 'weight_conv1')
 bias_conv1 = bias_variable([32], dtype = "float", name = 'bias_conv1')
 hidden_conv1 = tf.nn.relu(conv2d(x_image, weight_conv1) + bias_conv1)
+#tf.nn.relu()函数,激活函数，是将大于0的数保持不变，小于0的数置为0
 hidden_pool1 = max_pool_2x2(hidden_conv1)
 
 # convolution 2
@@ -47,10 +54,11 @@ hidden_pool2 = max_pool_2x2(hidden_conv2)
 hidden_pool2_flat = tf.reshape(hidden_pool2, [-1, 7 * 7 * 64])
 weight_fc1 = weight_variable([7 * 7 * 64, 1024], dtype = "float", name = 'weight_fc1')
 bias_fc1 = bias_variable([1024], dtype = "float", name = 'bias_fc1')
-hidden_fc1 = tf.nn.relu(tf.matmul(hidden_pool2_flat, weight_fc1) + bias_fc1)
+hidden_fc1 = tf.nn.relu(tf.matmul(hidden_pool2_flat, weight_fc1) + bias_fc1)#tf.matmul矩阵相乘
 keep_prob = tf.placeholder("float")
 hidden_fc1_dropout = tf.nn.dropout(hidden_fc1, keep_prob)
-
+#对第二层卷积经过relu后的结果，基于tensor值keep_prob进行保留或者丢弃相关维度上的数据。
+# 这个是为了防止过拟合，快速收敛。
 # function 2
 weight_fc2 = weight_variable([1024, 10], dtype = "float", name = 'weight_fc2')
 bias_fc2 = bias_variable([10], dtype = "float", name = 'weight_fc2')
