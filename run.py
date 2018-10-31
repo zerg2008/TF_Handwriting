@@ -51,7 +51,10 @@ hidden_conv2 = tf.nn.relu(conv2d(hidden_pool1, weight_conv2) + bias_conv2)
 hidden_pool2 = max_pool_2x2(hidden_conv2)
 
 # function 1
-hidden_pool2_flat = tf.reshape(hidden_pool2, [-1, 7 * 7 * 64])
+hidden_pool2_flat = tf.reshape(hidden_pool2, [-1, 7 * 7 * 64])# 把池化层2的输出扁平化为1维
+#形成一个 1 X（7*7*64）的矩阵
+# 这里有一点想不通，通过这样的reshape不是第一个参数是匹数，就是有多少张图片，第二个参数才是
+# 这张图片矩阵的行，也就是说应该是7*7*64行才对，但是怎么就变成1行，7*7*64列了？？？）
 weight_fc1 = weight_variable([7 * 7 * 64, 1024], dtype = "float", name = 'weight_fc1')
 bias_fc1 = bias_variable([1024], dtype = "float", name = 'bias_fc1')
 hidden_fc1 = tf.nn.relu(tf.matmul(hidden_pool2_flat, weight_fc1) + bias_fc1)#tf.matmul矩阵相乘
@@ -59,10 +62,14 @@ keep_prob = tf.placeholder("float")
 hidden_fc1_dropout = tf.nn.dropout(hidden_fc1, keep_prob)
 #对第二层卷积经过relu后的结果，基于tensor值keep_prob进行保留或者丢弃相关维度上的数据。
 # 这个是为了防止过拟合，快速收敛。
+#此次运算之后得到一个1 X 1024的矩阵
 # function 2
 weight_fc2 = weight_variable([1024, 10], dtype = "float", name = 'weight_fc2')
 bias_fc2 = bias_variable([10], dtype = "float", name = 'weight_fc2')
 y_fc2 = tf.nn.softmax(tf.matmul(hidden_fc1_dropout, weight_fc2) + bias_fc2)
+#矩阵乘运算之后得到一个1 X 10的矩阵，再加上偏移bias_fc2，就可以进行softmax分类了，经过分类
+#得到一个最大分类的概率。（在与偏移相加的时候也有一点想不通，矩阵运算结果是1行10列，
+# 而偏移矩阵是10行1列，这个是怎么加的，难道tf有自适应的能力？ ）
 
 # create tensorflow structure
 cross_entropy = -tf.reduce_sum(y * tf.log(y_fc2))
