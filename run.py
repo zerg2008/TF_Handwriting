@@ -91,7 +91,7 @@ session.run(init)
 
 # train
 def Train() :
-	for i in range(900):
+	for i in range(10000):
 	    batch = mnist.train.next_batch(50)
 	    session.run(train, feed_dict = {x:batch[0], y:batch[1], keep_prob:0.5})
 	    if i % 100 == 0:
@@ -136,7 +136,7 @@ def getTestPicArray(filename):
 			#if(im_arr[x][y] < threshold): im_arr[x][y] = im_arr[x][y] - im_arr[x][y] / 2
 
     out = Image.fromarray(np.uint8(im_arr))
-    out.save("./png/1psq.png")
+    out.save("./png/2psq.png")
 	#print im_arr
     nm = im_arr.reshape((1, 784))
 	
@@ -152,14 +152,14 @@ def testMyPicture() :
 	#testNum = input("input the number of test picture:")
 	for i in range(1) :
 		#testPicture = raw_input("input the test picture's path:")
-		oneTestx = getTestPicArray("./png/1ps.png")
+		oneTestx = getTestPicArray("./png/2ps.png")
 		ans = tf.argmax(y_fc2, 1)
 		print("The prediction answer is:") 
 		print(session.run(ans, feed_dict = {x:oneTestx, keep_prob:1}))
         #意思是每个元素被保留的概率，那么 keep_prob:1就是所有元素全部保留的意思。
 save_path = "network/cnn.ckpt"
-Train()
-save()
+#Train()
+#save()
 #restore()
-testMyPicture()
-session.close()
+#testMyPicture()
+#session.close()
