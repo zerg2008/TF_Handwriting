@@ -77,7 +77,12 @@ optimize = tf.train.AdamOptimizer(0.0001)
 train = optimize.minimize(cross_entropy)
 
 correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_fc2, 1))
+#tf.argmax(y, 1)返回向量y中最大值的索引
+#tf.cast将correct_prediction的数据格式转化成dtype.
+# 例如，原来correct_prediction的数据格式是bool， 这里将其转化为float
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+#tf.reduce_mean为求均值，这里我理解其是对一批，比如50个样本学习后求均值，
+#也就是这批样本的准确率。
 
 # initial all variables
 init = tf.initialize_all_variables() 
