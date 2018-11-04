@@ -8,6 +8,11 @@ import tensorflow as tf
 from PIL import ImageFilter
 import cv2
 
+#该模型的实验结果表明：对系统提供的数字识别率很高，对自己手写的
+#数字，当写字时用的笔比较细时，识别率很低基本在30%左右，
+#但是当手写的笔比较粗时，识别率有所提高可以达到70%，还是不能
+#实现百分之百的识别，模型还需要改进。20181104
+
 save_path = "network/cnn.ckpt"
 def weight_variable(shape, dtype, name):
     initial = tf.truncated_normal(shape = shape, stddev = 0.1, dtype = dtype, name = name)
@@ -226,7 +231,7 @@ def getTestPicArray(filename):
             # if(im_arr[x][y] < threshold): im_arr[x][y] = im_arr[x][y] - im_arr[x][y] / 2
 
     out = Image.fromarray(np.uint8(im_arr))
-    out.save("./png/2psq.png")
+    out.save("./png1/9psq.png")
     # print im_arr
     nm = im_arr.reshape((1, 784))
 
@@ -239,7 +244,7 @@ def testMyPicture() :
 	#testNum = input("input the number of test picture:")
 	for i in range(1) :
 		#testPicture = raw_input("input the test picture's path:")
-		oneTestx = getNumPicArray("./png/5ss.png")
+		oneTestx = getTestPicArray("./png1/9.png")
 		ans = tf.argmax(y_fc2, 1)
 		print("The prediction answer is:")
 		print(session.run(ans, feed_dict = {x:oneTestx, keep_prob:1}))
