@@ -4,6 +4,9 @@ import numpy as np
 from PIL import Image#python3中image要从PIL中导入
 #zerg，20181024 test
 
+session = tf.InteractiveSession()
+
+log_dir = './MNIST_LOG'    # 输出日志保存的路径
 def weight_variable(shape, dtype, name):
     initial = tf.truncated_normal(shape = shape, stddev = 0.1, dtype = dtype, name = name)
     #tf.truncated_normal这个函数产生正太分布，均值和标准差自己设定。
@@ -73,6 +76,8 @@ y_fc2 = tf.nn.softmax(tf.matmul(hidden_fc1_dropout, weight_fc2) + bias_fc2)
 
 # create tensorflow structure
 cross_entropy = -tf.reduce_sum(y * tf.log(y_fc2))
+tf.summary.scalar('loss', cross_entropy)
+
 optimize = tf.train.AdamOptimizer(0.0001)
 train = optimize.minimize(cross_entropy)
 
@@ -83,23 +88,33 @@ correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_fc2, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
 #tf.reduce_mean为求均值，这里我理解其是对一批，比如50个样本学习后求均值，
 #也就是这批样本的准确率。
+tf.summary.scalar('accuracy', accuracy)
+# summaries合并
+merged = tf.summary.merge_all()
+
 
 # initial all variables
-init = tf.initialize_all_variables() 
-session = tf.Session()
-session.run(init)
+#init = tf.initialize_all_variables()
+#session = tf.Session()
+
+# 写到指定的磁盘路径中
+train_writer = tf.summary.FileWriter(log_dir + '/train', session.graph)
+#test_writer = tf.summary.FileWriter(log_dir + '/test')
+tf.global_variables_initializer().run()
+#session.run(init)
 
 # train
 def Train() :
-	for i in range(10000):
-	    batch = mnist.train.next_batch(50)
-	    session.run(train, feed_dict = {x:batch[0], y:batch[1], keep_prob:0.5})
-	    if i % 100 == 0:
-		    print("step %4d: " % i)
-		    print(session.run(accuracy, feed_dict = {x:batch[0], y:batch[1], keep_prob:1}))
+    for i in range(1000):
+        batch = mnist.train.next_batch(50)
+        summary,_ = session.run([merged,train], feed_dict = {x:batch[0], y:batch[1], keep_prob:0.5})
+        train_writer.add_summary(summary,i)
+        if i % 100 == 0:
+            print("step %4d: " % i)
+            print(session.run(accuracy, feed_dict = {x:batch[0], y:batch[1], keep_prob:1}))
 
-	print(session.run(accuracy, feed_dict = {x:mnist.test.images, y:mnist.test.labels, keep_prob:1}))
-
+    print(session.run(accuracy, feed_dict = {x:mnist.test.images, y:mnist.test.labels, keep_prob:1}))
+    train_writer.close()
 # save variables
 def save() :
 	saver = tf.train.Saver()
@@ -158,8 +173,8 @@ def testMyPicture() :
 		print(session.run(ans, feed_dict = {x:oneTestx, keep_prob:1}))
         #意思是每个元素被保留的概率，那么 keep_prob:1就是所有元素全部保留的意思。
 save_path = "network/cnn.ckpt"
-#Train()
+Train()
 #save()
 #restore()
 #testMyPicture()
-#session.close()
+session.close()
