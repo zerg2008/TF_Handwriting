@@ -53,6 +53,9 @@ bias_conv2 = bias_variable([64], dtype = "float", name = 'bias_conv2')
 hidden_conv2 = tf.nn.relu(conv2d(hidden_pool1, weight_conv2) + bias_conv2)
 hidden_pool2 = max_pool_2x2(hidden_conv2)
 
+#因为池化半径为2,经过两次池化操作，图像的长和宽都发生了变化，为：第一次：28/2=14,第二次：14/2=7
+#所以这里得到的矩阵为7×7
+
 # function 1
 hidden_pool2_flat = tf.reshape(hidden_pool2, [-1, 7 * 7 * 64])# 把池化层2的输出扁平化为1维
 #形成一个 1 X（7*7*64）的矩阵
